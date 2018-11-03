@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BloggerToMd": {
+      "commandName": "Project",
+      "commandLineArgs": "-src \"C:\\Projects\\brainwipe\\icarv5\\input\\blog-10-19-2018.xml\""
+    }
+  }
+}
