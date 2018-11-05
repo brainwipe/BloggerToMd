@@ -73,22 +73,29 @@ namespace BloggerToMd
                 return;
             }
 
-            var fileName = $"{post.Date:yyyy-MM-dd}-{SafeFileName(post.OriginalUrl)}.md";
+            var safeFilename = SafeFileName(post.OriginalUrl);
+            var fileName = $"{post.Date:yyyy-MM-dd}-{safeFilename}.md";
             var sb = new StringBuilder();
-            sb.Append($@"Title: ""{post.Title}""
-Date: {post.Date:dd/MM/yy}
-OriginalUrl: ""{post.OriginalUrl}""
+            sb.Append($@"---
+path: ""/blog/{post.Date:yyyy}/{post.Date:MM}/{safeFilename}""
+title: ""{post.Title}""
+date: ""{post.Date:dd/MM/yy}""
+originalUrl: ""{post.OriginalUrl}""
 ---
 ");
             sb.Append(post.Markdown);
-            sb.Append(@"
+
+            if (post.Comments.Any())
+            {
+                sb.Append(@"
 ## Comments
 
 ");
-            foreach (var comment in post.Comments)
-            {
-                sb.Append(comment.Markdown);
-                sb.Append($"by _{comment.Author}_ on {comment.Date:D}");
+                foreach (var comment in post.Comments)
+                {
+                    sb.Append(comment.Markdown);
+                    sb.Append($"by _{comment.Author}_ on {comment.Date:D}");
+                }
             }
 
             var fullPath = Path.Combine(folder, fileName);
