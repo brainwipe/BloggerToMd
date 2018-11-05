@@ -73,14 +73,14 @@ namespace BloggerToMd
                 return;
             }
 
-            var fileName = $"{post.Date:yyyy-MM-dd}-{SafeFileName(post.Title)}.md";
+            var fileName = $"{post.Date:yyyy-MM-dd}-{SafeFileName(post.OriginalUrl)}.md";
             var sb = new StringBuilder();
             sb.Append($@"Title: ""{post.Title}""
 Date: {post.Date:dd/MM/yy}
+OriginalUrl: ""{post.OriginalUrl}""
 ---
 ");
             sb.Append(post.Markdown);
-
             sb.Append(@"
 ## Comments
 
@@ -95,12 +95,9 @@ Date: {post.Date:dd/MM/yy}
             File.WriteAllText(fullPath, sb.ToString());
         }
 
-        private static string SafeFileName(string fileName) =>
-            Path.GetInvalidFileNameChars()
-                .Aggregate(fileName, (current, c) => current.Replace(c, '-'))
-                .Substring(0, fileName.Length < 17 ? fileName.Length -1 : 17)
-                .Trim()
-                .Replace(' ', '-');
+        private static string SafeFileName(string originalUrl) => 
+            Path.GetFileName(originalUrl)
+                .Replace(".html",string.Empty);
 
         private static bool IsComment(XmlNode entry, XmlNamespaceManager manager)
         {
