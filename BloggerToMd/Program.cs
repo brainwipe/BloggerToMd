@@ -13,7 +13,7 @@ namespace BloggerToMd
 
         public void OnExecute()
         {
-            BloggerToMarkdown.Convert(Source);
+            BloggerToMarkdownService.Convert(Source);
         }
     }
 }
