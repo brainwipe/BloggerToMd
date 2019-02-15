@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using Html2Markdown;
 
@@ -26,6 +28,41 @@ namespace BloggerToMd.Domain.Entities
         public bool IsDraft { get; }
         public List<Comment> Comments { get; }
 
+        public string ToMarkdown(string path)
+        {
+            var sb = new StringBuilder();
+            sb.Append($@"---
+path: ""{path}""
+title: ""{Title}""
+date: ""{Date:yy/MM/dd}""
+originalUrl: ""{OriginalUrl}""
+slug: ""{path}""
+tags:
+");
+            foreach(var tag in Tags)
+            {
+                sb.Append($"    - {tag}\n");
+            }
+
+sb.Append(@"---
+");
+            sb.Append(Markdown);
+
+            if (Comments.Any())
+            {
+                sb.Append(@"
+## Comments
+
+");
+                foreach (var comment in Comments)
+                {
+                    sb.Append(comment.Markdown);
+                    sb.Append($"by _{comment.Author}_ on {comment.Date:D}");
+                }
+            }
+            return sb.ToString();
+        }
+
         public static BlogPost From(XmlNode blogPost, XmlNamespaceManager manager)
         {
             var converter = new Converter();
@@ -36,7 +73,6 @@ namespace BloggerToMd.Domain.Entities
             var date = DateTimeOffset.Parse(blogPost.SelectSingleNode("atom:published", manager).InnerText);
             var tagNodes = blogPost.SelectNodes("atom:category[@scheme='http://www.blogger.com/atom/ns#']/@term",
                 manager);
-
 
             var tags = new List<string>();
             foreach (XmlNode tag in tagNodes)

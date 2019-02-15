@@ -75,31 +75,10 @@ namespace BloggerToMd
 
             var safeFilename = SafeFileName(post.OriginalUrl);
             var fileName = $"{post.Date:yyyy-MM-dd}-{safeFilename}.md";
-            var sb = new StringBuilder();
-            sb.Append($@"---
-path: ""/blog/{post.Date:yyyy}/{post.Date:MM}/{safeFilename}""
-title: ""{post.Title}""
-date: ""{post.Date:yy/MM/dd}""
-originalUrl: ""{post.OriginalUrl}""
----
-");
-            sb.Append(post.Markdown);
-
-            if (post.Comments.Any())
-            {
-                sb.Append(@"
-## Comments
-
-");
-                foreach (var comment in post.Comments)
-                {
-                    sb.Append(comment.Markdown);
-                    sb.Append($"by _{comment.Author}_ on {comment.Date:D}");
-                }
-            }
-
+            var path = $"/blog/{post.Date:yyyy}/{post.Date:MM}/{safeFilename}";
+            var markdown = post.ToMarkdown(path);
             var fullPath = Path.Combine(folder, fileName);
-            File.WriteAllText(fullPath, sb.ToString());
+            File.WriteAllText(fullPath, markdown);
         }
 
         private static string SafeFileName(string originalUrl) => 
